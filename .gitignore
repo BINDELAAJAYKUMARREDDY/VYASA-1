@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environment
+vyasa_env/
+.venv/
+venv/
+
+# Local data and vector DB
+db/chroma/
+data/raw/
+data/downloads/
+data/processed/
+data/*.json
+data/*.jsonl
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temp
+*.log
+*.tmp

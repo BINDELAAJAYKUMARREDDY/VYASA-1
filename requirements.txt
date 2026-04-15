@@ -1,0 +1,33 @@
+# VYASA-1 Requirements
+# Install with: pip install -r requirements.txt
+
+# Core server
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.0
+
+# AI / ML
+torch>=2.3.0
+datasets==2.20.0
+transformers==4.44.2
+huggingface_hub>=0.34.0,<1.0.0
+tokenizers==0.19.1
+sentence-transformers==3.0.1
+fsspec==2024.5.0
+indic-transliteration>=2.3.60
+
+# Vector DB
+chromadb>=0.5.0
+
+# Data
+numpy>=1.26.0
+requests>=2.32.0
+
+# Tests
+pytest>=8.0.0
+
+# Optional: Unsloth (fastest fine-tuning — install separately if needed)
+# pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+
+# Optional: llama-cpp-python for GGUF inference
+# pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu122

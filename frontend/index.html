@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VYASA-1 — Vedic Wisdom AI</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-main: #f9f7f1;
+    --bg-card: #fffdf5;
+    --bg-soft: #fff8dc;
+    --text-main: #2e2e2e;
+    --text-muted: #8b6f3d;
+    --accent: #8b5e34;
+    --border: #e6dcc5;
+  }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: #f9f7f1;
+    min-height: 100vh;
+    color: var(--text-main);
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: #fffaf0;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+    color: #9b1b30;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+
+  .header p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 6px;
+  }
+
+  .om-symbol {
+    font-size: 1.4rem;
+    color: #9b1b30;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+
+  .chat-area {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 20px;
+    height: calc(100vh - 180px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-track { background: transparent; }
+  .chat-area::-webkit-scrollbar-thumb { background: #d7c9a8; border-radius: 2px; }
+
+  .message {
+    display: flex;
+    gap: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .avatar.ai { background: #fff3cd; border: 1px solid var(--border); }
+  .avatar.user { background: #eef3ff; border: 1px solid var(--border); }
+
+  .bubble {
+    max-width: 78%;
+    padding: 16px 18px;
+    border-radius: 14px;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+  }
+
+  .bubble.ai {
+    background: var(--bg-card);
+  }
+
+  .bubble.user { background: #eef3ff; color: #1e2a4a; text-align: right; }
+  .bubble:hover { transform: scale(1.01); transition: 0.2s; }
+
+  .emotion-tag {
+    font-size: 0.7rem;
+    color: #7a4e2a;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .bubble.ai h3 {
+    color: #7a4e2a;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .bubble.ai p { margin-bottom: 8px; }
+  .bubble.ai ul { margin-left: 18px; margin-top: 6px; }
+  .bubble.ai li { margin-bottom: 6px; }
+
+  .sources-row {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .source-chip {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(0,200,120,0.1);
+    color: #2f7a58;
+    border: 1px solid #cfe3d9;
+  }
+
+  .sources-row {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .source-chip {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(0,150,90,0.09);
+    color: #2f7a58;
+    border: 1px solid #cfe3d9;
+  }
+
+  blockquote {
+    background: var(--bg-soft);
+    border-left: 4px solid var(--accent);
+    padding: 12px 14px;
+    margin: 12px 0;
+    border-radius: 8px;
+    font-style: italic;
+    color: #5a4a2f;
+  }
+
+  .meta-row {
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    opacity: 0.9;
+  }
+
+  .meta-chip {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: #f7f2e3;
+    border: 1px solid #e6dcc5;
+    color: #7a6336;
+  }
+
+  .typing-dots span {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #d4a017;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+   .input-area {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fffaf0;
+    border-top: 1px solid var(--border);
+    padding: 12px;
+  }
+
+  .input-row {
+    max-width: 850px;
+    margin: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  textarea {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+    min-height: 48px;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: #9b8d73; }
+
+  button#send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  button#send-btn:hover { opacity: 0.9; }
+  button#send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .mode-bar {
+    max-width: 860px;
+    margin: 8px auto 0;
+    display: flex;
+    gap: 6px;
+  }
+
+  .mode-btn {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #e6dcc5;
+    background: transparent;
+    color: #7d6a42;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+
+  .mode-btn:hover, .mode-btn.active {
+    background: #f7f2e3;
+    border-color: #d4a017;
+    color: #b8860b;
+  }
+
+  .welcome {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+
+  .welcome .big-om {
+    font-size: 3rem;
+    color: #9b1b30;
+    display: block;
+    margin-bottom: 16px;
+    text-shadow: none;
+    font-weight: 700;
+  }
+
+  .welcome h2 { color: #9b1b30; margin-bottom: 10px; font-size: 1.2rem; letter-spacing: 2px; font-weight: 700; }
+  .welcome p { color: #7d6a42; font-size: 0.9rem; max-width: 500px; margin: 0 auto; line-height: 1.8; }
+
+  .quick-q {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .quick-q button {
+    background: #fff8dc;
+    border: 1px solid #e6dcc5;
+    color: #7d6a42;
+    font-family: 'Georgia', serif;
+    font-size: 0.78rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quick-q button:hover {
+    background: #f7f2e3;
+    color: #b8860b;
+  }
+
+  pre { white-space: pre-wrap; word-break: break-word; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="om-symbol">ॐ</span> VYASA-1</h1>
+  <p>VEDIC WISDOM · COMPASSIONATE GUIDANCE · SCRIPTURE-ACCURATE</p>
+</div>
+
+<div class="chat-area" id="chat"></div>
+
+<div class="input-area">
+  <div class="input-row">
+    <textarea id="msg" placeholder="Share what is in your heart... Any problem, doubt, or question." rows="1"></textarea>
+    <button id="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('default', this)">Default</button>
+    <button class="mode-btn" onclick="setMode('scholar', this)">Scholar Mode</button>
+    <button class="mode-btn" onclick="setMode('astronomy', this)">Astronomy</button>
+  </div>
+</div>
+
+<script>
+let sessionId = null;
+let currentMode = "default";
+const chat = document.getElementById("chat");
+const msgBox = document.getElementById("msg");
+
+function setMode(m, btn) {
+  currentMode = m;
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function showWelcome() {
+  const w = document.createElement("div");
+  w.className = "welcome";
+  w.innerHTML = `
+    <span class="big-om">ॐ</span>
+    <h2>WELCOME TO VYASA-1</h2>
+    <p>I am trained on all Vedas, 18 Mahapuranas, 18 Upapuranas, all Upanishads, Ramayana, Mahabharata, Srimad Bhagavatam and Bhagavad Gita. Share any problem — emotional, moral, scientific, or philosophical — and receive scripture-backed wisdom.</p>
+    <div class="quick-q">
+      <button onclick="ask(this)">I feel anxious about my future</button>
+      <button onclick="ask(this)">What is the meaning of dharma?</button>
+      <button onclick="ask(this)">How do I deal with grief?</button>
+      <button onclick="ask(this)">What happens after death?</button>
+      <button onclick="ask(this)">Vedic view of the cosmos</button>
+      <button onclick="ask(this)">I feel betrayed by someone I trusted</button>
+    </div>
+  `;
+  chat.appendChild(w);
+}
+
+function ask(btn) {
+  msgBox.value = btn.textContent;
+  sendMessage();
+}
+
+function addMessage(text, who, emotion, sources) {
+  const msg = document.createElement("div");
+  msg.className = `message ${who}`;
+
+  const av = document.createElement("div");
+  av.className = `avatar ${who}`;
+  av.textContent = who === "ai" ? "ॐ" : "👤";
+
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${who}`;
+
+  if (who === "ai") {
+    let html = "";
+    if (emotion) html += `<div class="emotion-tag">🔍 ${emotion.replace(/_/g, " ")}</div>`;
+    // render markdown if marked.js is available
+    if (window.marked) {
+      html += `<div>${marked.parse(text || "")}</div>`;
+    } else {
+      html += `<pre>${escapeHtml(text)}</pre>`;
+    }
+    if (sources && sources.length > 0) {
+      html += `<div class="sources-row">`;
+      sources.forEach(s => {
+        if (s) html += `<span class="source-chip">📜 ${escapeHtml(s)}</span>`;
+      });
+      html += `</div>`;
+    }
+    bubble.innerHTML = html;
+  } else {
+    bubble.textContent = text;
+  }
+
+  msg.appendChild(av);
+  msg.appendChild(bubble);
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+  return bubble;
+}
+
+function addTyping() {
+  const msg = document.createElement("div");
+  msg.className = "message ai";
+  msg.id = "typing";
+  msg.innerHTML = `
+    <div class="avatar ai">ॐ</div>
+    <div class="bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  `;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById("typing");
+  if (t) t.remove();
+}
+
+function escapeHtml(s) {
+  return (s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+async function sendMessage() {
+  const text = msgBox.value.trim();
+  if (!text) return;
+
+  const welcomeEl = chat.querySelector(".welcome");
+  if (welcomeEl) welcomeEl.remove();
+
+  addMessage(text, "user");
+  msgBox.value = "";
+  msgBox.style.height = "48px";
+  document.getElementById("send-btn").disabled = true;
+  addTyping();
+
+  try {
+    const res = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        session_id: sessionId,
+        mode: currentMode
+      })
+    });
+
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+    const data = await res.json();
+    sessionId = data.session_id;
+    removeTyping();
+    const full = data.response || "";
+    const bubble = addMessage("", "ai", data.emotion, data.sources);
+    // show confidence if available
+    if (data.confidence !== undefined) {
+      const meta = document.createElement("div");
+      meta.className = "meta-row";
+      meta.innerHTML = `<span class="meta-chip">confidence: ${Number(data.confidence).toFixed(2)}</span>`;
+      bubble.appendChild(meta);
+    }
+    // smooth render (no markdown flicker)
+    let html = "";
+    if (data.emotion) html += `<div class="emotion-tag">🔍 ${String(data.emotion).replace(/_/g, " ")}</div>`;
+    if (window.marked) html += marked.parse(full);
+    else html += `<pre>${escapeHtml(full)}</pre>`;
+    if (data.sources && data.sources.length > 0) {
+      html += `<div class="sources-row">`;
+      data.sources.forEach(s => { if (s) html += `<span class="source-chip">📜 ${escapeHtml(s)}</span>`; });
+      html += `</div>`;
+    }
+    bubble.innerHTML = html;
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch (err) {
+    removeTyping();
+    addMessage("There was a connection error. Please make sure the server is running on http://localhost:8000 and try again.", "ai", null, null);
+    console.error(err);
+  }
+
+  document.getElementById("send-btn").disabled = false;
+}
+
+msgBox.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+msgBox.addEventListener("input", () => {
+  msgBox.style.height = "48px";
+  msgBox.style.height = Math.min(msgBox.scrollHeight, 120) + "px";
+});
+
+showWelcome();
+</script>
+</body>
+</html>
